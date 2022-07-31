@@ -1,0 +1,19 @@
+{
+	"name": "cruppo-backend",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": "github:alenvalek/cruppo-backend",
+	"keywords": [
+		"cruppo",
+		"team",
+		"management",
+		"hr",
+		"ats"
+	],
+	"author": "Alen Valek",
+	"license": "MIT"
+}
