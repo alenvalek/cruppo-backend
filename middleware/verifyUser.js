@@ -22,6 +22,6 @@ module.exports = verifyUser = (req, res, next) => {
 		next();
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ msg: "Server Error" });
+		res.status(401).json({ msg: "Invalid token" });
 	}
 };

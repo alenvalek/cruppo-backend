@@ -3,46 +3,6 @@ const User = require("../models/User");
 const validator = require("email-validator");
 const generateRandomPassword = require("../utils/generateRandomPassword");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const verifyUser = require("../middleware/verifyUser");
-
-// get logged in user
-userRouter.get("/auth", verifyUser, async (req, res) => {
-	try {
-		let user = await User.findById(req.userID).select("-password");
-
-		res.json(user);
-	} catch (error) {
-		res.status(500).json({ msg: "Server Error" });
-		console.error(error);
-	}
-});
-
-// log in user
-userRouter.post("/login", async (req, res) => {
-	const { email, password } = req.body;
-
-	try {
-		const user = await User.findOne(email).select("-password");
-
-		if (!user) {
-			return res.status(401).json({ msg: "Invalid credentials." });
-		}
-
-		const passwordMatch = await bcrypt.compare(password, user.password);
-
-		if (!passwordMatch) {
-			return res.status(401).json({ msg: "Invalid credentials." });
-		}
-		const token = jwt.sign({ uid: user._id }, process.env.JWT_SECRET, {
-			expiresIn: "1 week",
-		});
-		res.status(200).json({ token });
-	} catch (error) {
-		res.status(500).json({ msg: "Server Error" });
-		console.error(error);
-	}
-});
 
 // register user
 userRouter.post("/", async (req, res) => {

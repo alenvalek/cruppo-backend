@@ -3,7 +3,8 @@ const dotenv = require("dotenv");
 const connectToDB = require("./config/connectToDb");
 const userRouter = require("./api/userRouter");
 const jobRoleRouter = require("./api/jobRoleRouter");
-
+const authenticationRouter = require("./api/authentication");
+const User = require("./models/User");
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
@@ -17,6 +18,7 @@ app.use(express.json());
 
 // api endpoints
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/authentication", authenticationRouter);
 app.use("/api/v1/roles", jobRoleRouter);
 
 app.listen(PORT, () =>
