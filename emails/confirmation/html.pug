@@ -1,0 +1,22 @@
+doctype html
+html 
+   head
+      link(rel="stylesheet", href="/css/confirmation/style.css", data-inline)
+   body
+      h2 Hello #{firstName} #{lastName}, your account at Cruppo has been created successfully. Please claim your account using the information below:
+      h3 Your first-time login info: 
+      ul
+         li 
+            p
+               strong Email:  
+               text #{email || 'error'}
+         li 
+            p
+               strong Temporary Password: 
+               text #{tempPassword || 'error'}
+   
+      p To claim your account please follow the following link: 
+         span
+            a(href=`${confirmationLink}`, target="_blank", rel="noopener noreferrer") #{confirmationLink}
+      p 
+         strong This confirmation link is only valid for 1 week, if you fail to confirm your account, contact your company's system admin to send you a new one.
