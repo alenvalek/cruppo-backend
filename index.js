@@ -4,12 +4,14 @@ const connectToDB = require("./config/connectToDb");
 const userRouter = require("./api/userRouter");
 const jobRoleRouter = require("./api/jobRoleRouter");
 const authenticationRouter = require("./api/authentication");
+const cors = require("cors");
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
 // creating the server instance
 const app = express();
+app.use(cors({ origin: "http://localhost:3000" }));
 
 // configuration and database connection
 connectToDB();

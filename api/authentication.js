@@ -13,7 +13,7 @@ authenticationRouter.get("/", verifyUser, async (req, res) => {
 				.status(401)
 				.json({ msg: "Account you're trying to access no longer exists." });
 		}
-		res.json(user);
+		res.send(user);
 	} catch (error) {
 		res.status(500).json({ msg: "Server Error" });
 		console.error(error);
@@ -29,7 +29,7 @@ authenticationRouter.post("/", async (req, res) => {
 	}
 
 	try {
-		const user = await User.findOne({ email: email }).select("-password");
+		const user = await User.findOne({ email: email });
 
 		if (!user) {
 			return res.status(401).json({ msg: "Invalid credentials." });
