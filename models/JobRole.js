@@ -11,6 +11,6 @@ const jobRoleSchema = new mongoose.Schema({
 	},
 });
 
-const JobRole = mongoose.model("Job role", jobRoleSchema);
+const JobRole = mongoose.model("job role", jobRoleSchema);
 
 module.exports = JobRole;
