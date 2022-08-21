@@ -10,7 +10,7 @@ const activityLogSchema = new mongoose.Schema(
 		actionEffect: {
 			type: String,
 			required: true,
-			enum: ["jobRole", "project", "user"],
+			enum: ["jobRole", "project", "user", "task"],
 		},
 		user: {
 			type: mongoose.Schema.Types.ObjectId,
