@@ -34,6 +34,33 @@ userRouter.get("/", async (req, res) => {
 	}
 });
 
+userRouter.get("/recent/:projectID", [verifyUser], async (req, res) => {
+	const { projectID } = req.params;
+	try {
+		const user = await User.findById(req.userID);
+		if (user.recentlyViewed.length < 3) {
+			if (user.recentlyViewed.includes(projectID)) {
+				return res.status(200).send();
+			} else {
+				user.recentlyViewed.unshift(projectID);
+			}
+		} else {
+			if (user.recentlyViewed.includes(projectID)) {
+				return res.status(200).send();
+			} else {
+				user.recentlyViewed.pop();
+				user.recentlyViewed.unshift(projectID);
+			}
+		}
+
+		await user.save();
+		return res.status(200).send();
+	} catch (error) {
+		res.status(500).json({ msg: "Server Error" });
+		console.error(error);
+	}
+});
+
 userRouter.patch(
 	"/user/:userID",
 	[verifyUser, verifyRole],

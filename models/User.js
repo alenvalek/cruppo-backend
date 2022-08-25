@@ -38,6 +38,12 @@ const userSchema = new mongoose.Schema({
 		required: true,
 		default: "employee",
 	},
+	recentlyViewed: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Project",
+		},
+	],
 });
 
 const User = mongoose.model("user", userSchema);

@@ -6,9 +6,10 @@ const User = require("../models/User");
 
 // get all job roles
 jobRoleRouter.get("/", verifyUser, async (req, res) => {
+	const allowedRoles = ["admin", "hr", "owner"];
 	try {
 		const user = await User.findById(req.userID);
-		if (user.role !== "admin") {
+		if (!allowedRoles.includes(user.role)) {
 			return res.status(401).json({ msg: "Insufficient permissions" });
 		}
 		const roles = await JobRole.find({});

@@ -9,7 +9,7 @@ authenticationRouter.get("/", verifyUser, async (req, res) => {
 	try {
 		const user = await User.findById(req.userID)
 			.select("-password")
-			.populate("position");
+			.populate(["position", "recentlyViewed"]);
 		if (!user) {
 			return res
 				.status(401)
