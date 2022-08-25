@@ -91,13 +91,15 @@ projectsRouter.get("/:projectID/summary", [verifyUser], async (req, res) => {
 projectsRouter.post("/", [verifyUser, verifyRole], async (req, res) => {
 	const { isSuperUser, userID } = req;
 
-	const { projectType, projectTag, projectDepartment, url } = req.body;
+	const { projectType, projectTag, projectDepartment, url, projectTitle } =
+		req.body;
 
 	if (!projectType || !projectTag || !projectDepartment)
 		return res.status(400).json({ msg: "All fields are required." });
 	try {
 		if (isSuperUser) {
 			let newProject = new Project({
+				projectName: projectTitle,
 				projectType,
 				projectTag,
 				projectDepartment,
@@ -120,6 +122,7 @@ projectsRouter.post("/", [verifyUser, verifyRole], async (req, res) => {
 			return res.status(400).json({ msg: "Insufficient permissions" });
 
 		let newProject = new Project({
+			projectName: projectTitle,
 			projectType,
 			projectTag,
 			projectDepartment,
