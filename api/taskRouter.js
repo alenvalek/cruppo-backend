@@ -2,6 +2,7 @@ const taskRouter = require("express").Router();
 const verifyUser = require("../middleware/verifyUser");
 const verifyRole = require("../middleware/verifyRole");
 const Project = require("../models/Project");
+const ActivityLog = require("../models/ActivityLog");
 const Task = require("../models/Task");
 
 taskRouter.patch(

@@ -11,7 +11,7 @@ module.exports = verifyUser = (req, res, next) => {
 		}
 		const token = req.headers.authorization.split(" ")[1];
 		const data = jwt.verify(token, process.env.JWT_SECRET, {
-			maxAge: "1 week",
+			maxAge: "14d",
 		});
 
 		if (!data) {

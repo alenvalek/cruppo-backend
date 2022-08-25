@@ -1,6 +1,7 @@
 const userRouter = require("express").Router();
 const User = require("../models/User");
 const Project = require("../models/Project");
+const ActivityLog = require("../models/ActivityLog");
 const validator = require("email-validator");
 const generateRandomPassword = require("../utils/generateRandomPassword");
 const bcrypt = require("bcryptjs");
@@ -85,7 +86,7 @@ userRouter.delete(
 			const newActivityLog = new ActivityLog({
 				actionType: "delete",
 				actionEffect: "user",
-				user: userID,
+				user: req.userID,
 			});
 			newActivityLog.save();
 			return res.status(200).send();
@@ -122,33 +123,110 @@ userRouter.get("/user/:userID", async (req, res) => {
 	}
 });
 
-userRouter.get("/confirm", async (req, res) => {
-	const email = new Email({
-		message: {
-			from: "cruppo.noreply@gmail.com",
-		},
-		transport: transporter,
-	});
+userRouter.get("/confirm/:token", async (req, res) => {
+	const { token } = req.params;
+	try {
+		if (!token) {
+			return res.status(400).json({ msg: "Token not found" });
+		}
 
-	let user = {
-		firstName: "Alen",
-		lastName: "Valek",
-		email: "valekalen@gmail.com",
-	};
+		const data = jwt.verify(token, process.env.JWT_SECRET, {
+			maxAge: "100d",
+		});
+		if (!data) {
+			return res.status(401).json({ msg: "Invalid token" });
+		}
 
-	await email.send({
-		template: "confirmation",
-		message: {
-			to: "valekalen@gmail.com",
-			subject: "Cruppo - Confirmation link",
-		},
-		locals: user,
-	});
-	res.status(200).send();
+		res.status(200).json(data);
+	} catch (error) {
+		if (error.message === "jwt expired") {
+			return res.status(401).json({ msg: "Link expired" });
+		}
+		return res.status(500).json({ msg: "Server Error" });
+	}
 });
 
+userRouter.patch("/confirm/:userid", async (req, res) => {
+	const { password } = req.body;
+	const { userid } = req.params;
+
+	if (!password || password.length < 6) {
+		return res.status(400).json({
+			msg: "Password is required and it has to be at least 6 characters long.",
+		});
+	}
+
+	try {
+		const salt = await bcrypt.genSalt(10);
+		const hashedPassword = await bcrypt.hash(password, salt);
+
+		const user = await User.findById(userid);
+		user.password = hashedPassword;
+		user.hasTempPassword = false;
+		await user.save();
+
+		return res.status(200).send();
+	} catch (error) {
+		console.log(error);
+		return res.status(500).json({ msg: "Server Error" });
+	}
+});
+
+userRouter.get(
+	"/confirm/resend/:userID",
+	[verifyUser, verifyRole],
+	async (req, res) => {
+		const { userID } = req.params;
+
+		try {
+			if (!req.isSuperUser) {
+				return res.status(401).json({ msg: "Unauthorized." });
+			}
+
+			const user = await User.findById(userID);
+			if (!user) {
+				return res.status(400).json({ msg: "User doesn't exist" });
+			}
+
+			const confirmToken = jwt.sign({ uid: user._id }, process.env.JWT_SECRET, {
+				expiresIn: "7d",
+			});
+
+			let userEmailData = {
+				firstName: user.firstName,
+				lastName: user.lastName,
+				email: user.email,
+				confirmationLink: `${frontEndBaseURL}/confirm/${confirmToken}`,
+			};
+
+			const emailToSend = new Email({
+				message: {
+					from: "cruppo.noreply@gmail.com",
+				},
+				preview: false,
+				send: true,
+				transport: transporter,
+			});
+
+			await emailToSend.send({
+				template: "confirmation",
+				message: {
+					to: userEmailData.email,
+					subject: "Cruppo - Confirmation link",
+				},
+				locals: userEmailData,
+			});
+
+			return res.status(200).send();
+		} catch (error) {
+			console.log(error);
+			return res.status(500).json({ msg: "Server Error" });
+		}
+	}
+);
+
 // register user
-userRouter.post("/", async (req, res) => {
+userRouter.post("/", [verifyUser], async (req, res) => {
 	const { firstName, lastName, email, salary, position, role } = req.body;
 
 	if (!firstName || !lastName || !email || !salary || !position) {
@@ -189,7 +267,7 @@ userRouter.post("/", async (req, res) => {
 		const newActivityLog = new ActivityLog({
 			actionType: "create",
 			actionEffect: "user",
-			user: userID,
+			user: req.userID,
 		});
 		newActivityLog.save();
 		newUser = newUser.toJSON();

@@ -7,7 +7,9 @@ const bcrypt = require("bcryptjs");
 // get user data
 authenticationRouter.get("/", verifyUser, async (req, res) => {
 	try {
-		const user = await User.findById(req.userID).select("-password");
+		const user = await User.findById(req.userID)
+			.select("-password")
+			.populate("position");
 		if (!user) {
 			return res
 				.status(401)

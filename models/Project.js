@@ -32,6 +32,10 @@ const projectSchema = new mongoose.Schema({
 			ref: "user",
 		},
 	],
+	url: {
+		type: String,
+		default: "",
+	},
 });
 
 const Project = mongoose.model("Project", projectSchema);

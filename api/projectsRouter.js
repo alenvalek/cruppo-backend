@@ -3,6 +3,7 @@ const verifyUser = require("../middleware/verifyUser");
 const Project = require("../models/Project");
 const Task = require("../models/Task");
 const User = require("../models/User");
+const ActivityLog = require("../models/ActivityLog");
 
 const projectsRouter = require("express").Router();
 
@@ -90,18 +91,19 @@ projectsRouter.get("/:projectID/summary", [verifyUser], async (req, res) => {
 projectsRouter.post("/", [verifyUser, verifyRole], async (req, res) => {
 	const { isSuperUser, userID } = req;
 
-	const { projectType, projectTag, projectDepartment } = req.body;
+	const { projectType, projectTag, projectDepartment, url } = req.body;
 
 	if (!projectType || !projectTag || !projectDepartment)
 		return res.status(400).json({ msg: "All fields are required." });
 	try {
 		if (isSuperUser) {
-			const newProject = new Project({
+			let newProject = new Project({
 				projectType,
 				projectTag,
 				projectDepartment,
 				teamLead: userID,
 			});
+			if (url) newProject.url = url;
 			newProject.teamMembers.unshift(userID);
 			await newProject.save();
 			const newActivityLog = new ActivityLog({
@@ -117,12 +119,13 @@ projectsRouter.post("/", [verifyUser, verifyRole], async (req, res) => {
 		if (!currentUser.position.canStartProject)
 			return res.status(400).json({ msg: "Insufficient permissions" });
 
-		const newProject = new Project({
+		let newProject = new Project({
 			projectType,
 			projectTag,
 			projectDepartment,
 			teamLead: userID,
 		});
+		if (url) newProject.url = url;
 		newProject.teamMembers.unshift(userID);
 		await newProject.save();
 		return res.status(200).json(newProject);
@@ -159,10 +162,9 @@ projectsRouter.delete("/:projectid/:userid", [verifyUser], async (req, res) => {
 
 	try {
 		const project = await Project.findById(projectid).populate("teamMembers");
-		const elementToRemove = project.teamMembers.some(
+		const elementToRemove = project.teamMembers.findIndex(
 			(e) => e._id.toString() === userid
 		);
-
 		project.teamMembers.splice(elementToRemove, 1);
 		await project.save();
 		await Project.populate(project, "teamMembers.position");
@@ -170,7 +172,7 @@ projectsRouter.delete("/:projectid/:userid", [verifyUser], async (req, res) => {
 		const newActivityLog = new ActivityLog({
 			actionType: "delete",
 			actionEffect: "project",
-			user: userID,
+			user: req.userID,
 		});
 		newActivityLog.save();
 		return res.status(200).json(project.teamMembers);
@@ -182,17 +184,17 @@ projectsRouter.delete("/:projectid/:userid", [verifyUser], async (req, res) => {
 
 // update project
 projectsRouter.patch(
-	"/:projectID",
+	"/:projectID/:user_id",
 	[verifyUser, verifyRole],
 	async (req, res) => {
 		const { isSuperUser, userID } = req;
-		const { projectID } = req.params;
+		const { projectID, user_id } = req.params;
 		const { projectType, projectTag, projectDepartment, updateType } = req.body;
 
 		try {
 			const projectExists = await Project.findById(projectID);
 			const currentUser = await User.findById(userID).populate("position");
-			if (!currentUser.position.canStartProject && !isSuperUser)
+			if (!currentUser.position.canStartProject || !isSuperUser)
 				res.status(400).json({ msg: "Insufficient permissions" });
 
 			if (!projectExists)
@@ -205,11 +207,11 @@ projectsRouter.patch(
 					projectExists.projectDepartment = projectDepartment;
 			} else if (updateType === "removeUser") {
 				const position = projectExists.teamMembers.findIndex(
-					(user) => user.toString() === userID
+					(user) => user.toString() === user_id
 				);
 				projectExists.teamMembers.splice(position, 1);
 			} else if (updateType === "addUser") {
-				projectExists.teamMembers.unshift(userID);
+				projectExists.teamMembers.unshift(user_id);
 			}
 			const newActivityLog = new ActivityLog({
 				actionType: "update",
