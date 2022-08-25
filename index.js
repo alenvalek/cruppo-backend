@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 5000;
 
 // creating the server instance
 const app = express();
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors({ origin: process.env.FRONTEND_URL }));
 
 // configuration and database connection
 connectToDB();

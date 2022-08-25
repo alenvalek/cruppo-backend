@@ -11,7 +11,7 @@ const jwt = require("jsonwebtoken");
 const verifyUser = require("../middleware/verifyUser");
 const verifyRole = require("../middleware/verifyRole");
 
-const frontEndBaseURL = "http://localhost:3000";
+const frontEndBaseURL = process.env.FRONTEND_URL;
 
 // service for sending out emails using a company mail account
 // ( currently set up to work with google gmail )
