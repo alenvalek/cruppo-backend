@@ -30,6 +30,10 @@ Create a .env file inside the server folder and fill it up with required values:
 MONGO_URI = {your_mongo_uri}
 SECRET_KEY = {your_secret_key}
 PORT(optional) = {your_desired_port}
+FRONTEND_URL = {your_frontend_url}
+[FOR USE OF EMAIL NOTIFICATIONS AND CONFIRMATIONS]
+COMPANY_GMAIL = {your_company_gmail}
+GMAIL_APP_PASSWORD = {your_gmail_app_password}
 ```
 
 Inside both server and client install the required modules: 
