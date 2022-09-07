@@ -1,9 +1,14 @@
 # Cruppo - Backend ![GitHub package.json version](https://img.shields.io/github/package-json/v/alenvalek/cruppo-backend) ![GitHub](https://img.shields.io/github/license/alenvalek/cruppo-backend) ![GitHub last commit](https://img.shields.io/github/last-commit/alenvalek/cruppo-backend) ![Maintenance](https://img.shields.io/maintenance/yes/2022) ![GitHub repo size](https://img.shields.io/github/repo-size/alenvalek/cruppo-backend) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/alenvalek/cruppo-backend)
 Cruppo is a team management app built as a final year project at Faculty Of Informatics in Pula. The app itself is built using MongoDB as a database, ReactJS as a frontend library and express as a server solution. Cruppo's goal is to ease the pain of team work and team workflow in IT by making it easier to manage teams and their projects. It also helps HR department of any company by implementing a versitile ATS which can be customized to their needs. It helps narrow down applicants to only those relevant enough. 
 ***
-## Key features
-* ### Coming soon.. 🔜
-***
+## Demo
+* Demo link: https://cruppo.netlify.app/
+* Demo accounts: 
+
+**[SUPER USER ACCOUNT]**<br>
+**Email:** cruppo.noreply@gmail.com <br>
+**Password:** test123
+
 ## Installation
 Generate two separate folders, one for the client and one for the server
 ```
